@@ -5,26 +5,36 @@
   <arg name="respawn_value" default="false" /> <!-- boolean: true, false -->
   
   <!-- Bag file path -->  
-  <!-- <arg name="bag_file" value="$(env HOME)/.segmap/kitti/2011_09_30_drive_18.bag"/> -->
-  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_09_30_drive_18.bag"/> -->
-  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_10_03_drive_27.bag"/> -->
-
-
-
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/kitti2segmap_093027_synced.bag"/> -->
   <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_lego_synced.bag"/>
 
   <rosparam param="LaserMapper/bag_file" subst_value="True">$(arg bag_file)</rosparam>
-  
+	
   <!-- Rviz visualization config file path -->
-  <arg name="rviz_config_file" value="$(env HOME)/.segmap/kitti/kitti_loop_closure.rviz"/>
+  <arg name="rviz_config_file" value="$(env HOME)/.segmap/kitti/kitti_localization.rviz"/>
 
   <!-- ROS parameters -->
   <rosparam>use_sim_time: true</rosparam>
-  <rosparam command="load" file="$(find segmapper)/launch/kitti/cnn_kitti_loop_closure.yaml"/>
+
+  <rosparam command="load" file="$(find segmapper)/launch/kitti/cnn_kitti_localization.yaml"/>
+  
+  <!-- Target cloud -->
+<!--   <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/kitti_loam_segmap_093027.pcd"/>
+ -->  
+  <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/loop2_target.pcd"/>
+
+
+
+  <rosparam param="/SegMapper/SegMatchWorker/target_cloud_filename" subst_value="True">$(arg target_cloud)</rosparam>
+  
+  <!-- Callgrind profiling option -->
+  <arg name="enable_callgrind" default="false" />
+  <arg name="play_rate" value="0.005" if="$(arg enable_callgrind)"/>
+  <arg name="play_rate" value="1" unless="$(arg enable_callgrind)"/>
 
   <!-- rviz node -->
   <node name="visualizer" pkg="rviz" type="rviz" output="screen" respawn="$(arg respawn_value)" args="-d $(arg rviz_config_file)" />
-  
+
   <!-- CNN model path -->
   <arg name="cnn_model_path" value="$(env HOME)/.segmap/trained_models/segmap64/"/>
   <rosparam param="/SegMapper/SegMatchWorker/SegMatch/Descriptors/cnn_model_path" subst_value="True">$(arg cnn_model_path)</rosparam>
@@ -32,16 +42,16 @@
   <!-- Semantics nn path -->
   <arg name="semantics_nn_path" value="$(env HOME)/.segmap/trained_models/segmap64_semantics/"/>
   <rosparam param="/SegMapper/SegMatchWorker/SegMatch/Descriptors/semantics_nn_path" subst_value="True">$(arg semantics_nn_path)</rosparam>
-  
+
+  <!-- rosbag player node -->
+  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r $(arg play_rate) -s 0 --clock --pause  $(arg bag_file)"/>
+
+
   <!-- segmapper node -->
   <include file="$(find segmapper)/launch/segmapper.launch">
     <arg name="icp_configuration_file" value="$(find segmapper)/launch/kitti/icp_dynamic_outdoor.yaml"/>
     <arg name="icp_input_filters_file" value="$(find segmapper)/launch/kitti/input_filters_outdoor.yaml"/>
+    <arg name="enable_callgrind" value="$(arg enable_callgrind)"/>
   </include>
-  
-    <!-- rosbag player node -->
-  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r 1 -s 0 --clock --pause $(arg bag_file)"/> 
-
- 
- 
+	
 </launch>

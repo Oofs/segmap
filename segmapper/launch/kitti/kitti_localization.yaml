@@ -75,7 +75,7 @@ SegMapper: {
     },
 
     Descriptors: {
-      descriptor_types: ["EigenvalueBased"], # "EnsembleShapeFunctions"
+      descriptor_types: ["EigenvalueBased"], # "EnsembleShapeFunctions" "EigenvalueBased"
     },
 
     Classifier: {
@@ -108,7 +108,7 @@ SegMapper: {
     loop_closures_sub_maps_radius: 3,
 
     LaserTrack: {
-      odometry_noise_model: [0.5, 0.5, 0.5, 0.015, 0.015, 0.015],
+      odometry_noise_model: [1.0,1.0,1.0,0.015,0.015,0.015], #[0.5, 0.5, 0.5, 0.015, 0.015, 0.015], #
       icp_noise_model: [0.5, 0.05, 0.05, 0.015, 0.015, 0.015],
       add_m_estimator_on_odom: false,
       add_m_estimator_on_icp: false,
