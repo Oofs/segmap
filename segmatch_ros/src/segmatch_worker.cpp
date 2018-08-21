@@ -1,6 +1,8 @@
 #include "segmatch_ros/segmatch_worker.hpp"
 
 #include <laser_slam/benchmarker.hpp>
+#include <unistd.h>
+#include <eigen_conversions/eigen_msg.h>
 #include <laser_slam/common.hpp>
 #include <pcl/common/common.h>
 #include <pcl/common/transforms.h>
@@ -69,6 +71,8 @@ void SegMatchWorker::init(ros::NodeHandle& nh, const SegMatchWorkerParams& param
   export_target_map_ = nh.advertiseService(
       "export_target_map", &SegMatchWorker::exportTargetMap, this);
 
+  last_transformation_pub_ = nh.advertise<geometry_msgs::Transform>(
+      "/segmatch/last_transformation", 5, true);
   if (std::find(params_.segmatch_params.descriptors_params.descriptor_types.begin(),
                 params_.segmatch_params.descriptors_params.descriptor_types.end(),
                 "CNN") !=
@@ -81,6 +85,7 @@ void SegMatchWorker::init(ros::NodeHandle& nh, const SegMatchWorkerParams& param
 
   if (params_.localize) {
     loadTargetCloud();
+    usleep(1000000);
     publishTargetRepresentation();
     publishTargetSegmentsCentroids();
   }
@@ -416,6 +421,16 @@ void SegMatchWorker::publishLoopClosures() const {
   // Query the segmentation_poses_ at that time.
   publishLineSet(point_pairs, params_.world_frame, params_.line_scale_loop_closures,
                  Color(1.0, 1.0, 1.0), loop_closures_pub_);
+}
+
+void SegMatchWorker::publishLastTransformation() const {
+  if (first_localization_occured) {
+    Eigen::Affine3d transformation;
+    segmatch_.getLastTransform(&(transformation.matrix()));
+    geometry_msgs::Transform transform_msg;
+    tf::transformEigenToMsg(transformation, transform_msg);
+    last_transformation_pub_.publish(transform_msg);
+  }
 }
 
 bool SegMatchWorker::exportRunServiceCall(std_srvs::Empty::Request& req,

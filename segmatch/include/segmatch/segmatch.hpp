@@ -184,6 +184,7 @@ class SegMatch {
   void alignTargetMap();
 
   void displayTimings() const;
+  void getLastTransform(Eigen::Matrix4d* out) const;
 
   void saveTimings() const;
 
