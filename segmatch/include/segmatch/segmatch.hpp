@@ -226,6 +226,7 @@ class SegMatch {
   std::vector<laser_slam::RelativePose> loop_closures_;
 
   Eigen::Matrix4f last_transformation_;
+  Eigen::Matrix4f transformation_local_to_global_;
 
   std::vector<double> loops_timestamps_;
 

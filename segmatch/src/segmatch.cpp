@@ -255,6 +255,7 @@ const PairwiseMatches& SegMatch::recognize(const PairwiseMatches& predicted_matc
     return last_filtered_matches_;
   } else {
     last_filtered_matches_ = candidate_clusters.front();
+    transformation_local_to_global_ = recognizer->getCandidateTransformations().front();
   }
 
   // If desired, return the loop-closure.
@@ -614,7 +615,7 @@ Time SegMatch::findTimeOfClosestSegmentationPose(const Segment& segment) const {
 
 void SegMatch::getLastTransform(Eigen::Matrix4d* out) const {
   CHECK_NOTNULL(out);
-  *out = last_transformation_.cast<double>();
+  *out = transformation_local_to_global_.cast<double>();
 }
 
 void SegMatch::alignTargetMap() {

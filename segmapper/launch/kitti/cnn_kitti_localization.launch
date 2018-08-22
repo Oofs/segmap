@@ -6,7 +6,7 @@
   
   <!-- Bag file path -->  
   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/kitti2segmap_093027_synced.bag"/> -->
-  <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_lego_synced.bag"/>
+  <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_lego_second_synced.bag"/>
 
   <rosparam param="LaserMapper/bag_file" subst_value="True">$(arg bag_file)</rosparam>
 	
@@ -44,7 +44,7 @@
   <rosparam param="/SegMapper/SegMatchWorker/SegMatch/Descriptors/semantics_nn_path" subst_value="True">$(arg semantics_nn_path)</rosparam>
 
   <!-- rosbag player node -->
-  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r $(arg play_rate) -s 0 --clock --pause  $(arg bag_file)"/>
+  <node name="player" pkg="rosbag" type="play" output="screen" args=" -r $(arg play_rate) -s 0 --clock --pause  $(arg bag_file) "/>
 
 
   <!-- segmapper node -->

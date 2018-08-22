@@ -228,12 +228,12 @@ void SegMatchWorker::publish() {
     publishMatches();
     matches_.clear();
     publishSourceRepresentation();
-    //publishSourceReconstruction();
-    //publishSourceSemantics();
+    publishSourceReconstruction();
+    publishSourceSemantics();
 
     publishSourceSegmentsCentroids();
-    //publishSegmentationPositions();
-
+    publishSegmentationPositions();
+    publishLastTransformation();
     // If closing loops, republish the target map.
     if (params_.close_loops) {
       publishLoopClosures();
@@ -280,8 +280,8 @@ void SegMatchWorker::publishTargetReconstruction() const {
 void SegMatchWorker::publishSourceReconstruction() const {
   PointICloud source_reconstruction;
   segmatch_.getSourceReconstruction(&source_reconstruction);
-  translateCloud(Translation(0.0, 0.0, params_.distance_to_lower_target_cloud_for_viz_m),
-                 &source_reconstruction);
+  // translateCloud(Translation(0.0, 0.0, params_.distance_to_lower_target_cloud_for_viz_m),
+  //                &source_reconstruction);
   sensor_msgs::PointCloud2 source_reconstruction_as_message;
   convert_to_point_cloud_2_msg(source_reconstruction, params_.world_frame,
                                &source_reconstruction_as_message);
@@ -424,9 +424,10 @@ void SegMatchWorker::publishLoopClosures() const {
 }
 
 void SegMatchWorker::publishLastTransformation() const {
-  if (first_localization_occured) {
+  if (first_localization_occured_) {
     Eigen::Affine3d transformation;
     segmatch_.getLastTransform(&(transformation.matrix()));
+    ROS_INFO("raw transformation:%f %f %f %f   ",transformation(0,1),transformation(0,2),transformation(0,3),transformation(0,4));
     geometry_msgs::Transform transform_msg;
     tf::transformEigenToMsg(transformation, transform_msg);
     last_transformation_pub_.publish(transform_msg);
