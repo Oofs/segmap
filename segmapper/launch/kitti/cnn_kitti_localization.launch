@@ -4,9 +4,20 @@
   
   <arg name="respawn_value" default="false" /> <!-- boolean: true, false -->
   
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_10_03_drive_27.bag"/> -->
   <!-- Bag file path -->  
   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/kitti2segmap_093027_synced.bag"/> -->
-  <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_lego_second_synced.bag"/>
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop3_workday_2018_08_24_synced.bag"/> -->
+
+   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop3_workday_2018_08_24_synced.bag"/> -->
+
+   <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/imu_loop_long_test_synced.bag"/>
+
+   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_weekend_lego_synced.bag"/> -->
+   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/workday_seq1_2018-09-07_synced.bag"/> -->
+
+    <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/workday_seq2_2018-09-07_synced.bag"/> -->
+   
 
   <rosparam param="LaserMapper/bag_file" subst_value="True">$(arg bag_file)</rosparam>
 	
@@ -19,10 +30,12 @@
   <rosparam command="load" file="$(find segmapper)/launch/kitti/cnn_kitti_localization.yaml"/>
   
   <!-- Target cloud -->
-<!--   <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/kitti_loam_segmap_093027.pcd"/>
- -->  
-  <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/loop2_target.pcd"/>
-
+  <!-- <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/kitti_loam_segmap_093027.pcd"/> -->
+  
+  <!-- <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/loop_long_weekend.pcd"/> -->
+  <!-- <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/loop3_workday.pcd"/> -->
+  <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/loop_long_representation_r0.2.pcd"/>
+  <!-- <arg name="target_cloud" value="$(env HOME)/.segmap/kitti/weekend_map1_2018-09-09.pcd"/> -->
 
 
   <rosparam param="/SegMapper/SegMatchWorker/target_cloud_filename" subst_value="True">$(arg target_cloud)</rosparam>
@@ -41,6 +54,7 @@
   
   <!-- Semantics nn path -->
   <arg name="semantics_nn_path" value="$(env HOME)/.segmap/trained_models/segmap64_semantics/"/>
+  <!-- <arg name="semantics_nn_path" value="$(env HOME)/.segmap/trained_models/loop_long_semantics/"/> -->
   <rosparam param="/SegMapper/SegMatchWorker/SegMatch/Descriptors/semantics_nn_path" subst_value="True">$(arg semantics_nn_path)</rosparam>
 
   <!-- rosbag player node -->

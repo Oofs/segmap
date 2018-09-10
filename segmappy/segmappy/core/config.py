@@ -3,7 +3,8 @@ import os
 
 def get_segmap_home_dir():
     segmap_home = os.path.abspath(
-        os.path.join(os.path.expanduser("~"), ".segmap/")
+        # os.path.join(os.path.expanduser("~"), ".segmap/")
+        "/media/tianning/Seagate Expansion Drive/ytn/segmap_data"
     )
 
     # If home directory doesn't exist create
@@ -132,3 +133,6 @@ class Config(object):
         self.batch_size = config.getint("train", "batch_size")
         self.log_path = config.get("train", "log_path")
         self.debug_path = config.get("train", "debug_path")
+
+    def get_path(self):
+        return get_default_dataset_dir()

@@ -33,56 +33,32 @@ def scatter3d(x,y,z, cs, colorsMap='jet'):
 configfile = "default_training.ini"
 config = Config(configfile)
 # tweak config parameters
-config.folder = "dataset18"
-# config.use_matches = False
-# config.use_merges = False
+config.folder = "loop_long"
 
-# False: will go through unlabeled segments and append to the csv file
-# True: will go through the segments labeled as CLASS and
-#       rewrite the database at the end
-RELABEL = True
+WRITE_LABEL = True
 AUTOWALLS = False
 CLASS = 2
 CLASSES = ["other", "car", "building"]
-
+default_label = 0
 # load dataset
 dataset = get_default_dataset(config,config.folder)
 
-segments, _, ids, n_ids, features, matches, _ = dataset.load()
-# segments, _, ids, n_ids, features, matches= dataset.load_no_label()
+# segments, _, ids, n_ids, features, matches, _ = dataset.load()
+segments, _, ids, n_ids, features, matches= dataset.load_no_label()
+labels = []
+seg_ids = []
 
-lids = dataset.lids
-lids_lookup = dict()
-for i, lid in enumerate(lids):
-    lids_lookup[lid] = i
-labels = dataset.labels
-
-if RELABEL:
-    default_label = CLASS
-    n_objects = np.sum(labels == CLASS)
-    print("There are " + str(n_objects) + " " + CLASSES[CLASS] + "(s).")
-else:
-    default_label = 0
-    fp_labels = open(os.path.join(config.folder, "labels_database.csv"), "a")
-
-print("Default is " + str(default_label) + ":" + CLASSES[default_label] + ".")
 print("Type q and then ENTER to quit.")
 for i in range(ids.size):
     # skip if it's not the last duplicate
     if i + 1 < ids.size and ids[i] == ids[i + 1]:
         continue
 
-    if RELABEL:
-        if not ids[i] in lids_lookup or labels[lids_lookup[ids[i]]] != CLASS:
-            continue
-    else:
-        if ids[i] in lids_lookup:
-            continue
 
     fig = plt.figure(1)
     plt.clf()
 
-    ax = fig.add_subplot(121, projection="3d")
+    ax = fig.add_subplot(221, projection="3d")
 
     segment = segments[i]
     segment = segment - np.min(segment, axis=0)
@@ -93,39 +69,61 @@ for i in range(ids.size):
     ax.set_zlim(0, np.max(segment[:, :]))
 
     x, y, z = np.hsplit(segment, segment.shape[1])
-    # print(x.reshape(1,x.shape[0]), y.reshape(1,y.shape[0]), z.reshape(1,z.shape[0]), c=z.reshape(1,z.shape[0]))
-    # scatter3d(x.reshape(1,x.shape[0]), y.reshape(1,y.shape[0]), z.reshape(1,z.shape[0]), z.reshape(z.shape[0],))
-   
+    
     ax.scatter(x,y,z, c=z.reshape(z.shape[0],))
 
-    ax = fig.add_subplot(122)
+    ax = fig.add_subplot(222)
     ax.scatter(x, y)
     ax.set_xlim(0, np.max(segment[:, :]))
     ax.set_ylim(0, np.max(segment[:, :]))
+
+    ax = fig.add_subplot(223)
+    ax.scatter(x, z)
+    ax.set_xlim(0, np.max(segment[:, :]))
+    ax.set_ylim(0, np.max(segment[:, :]))
+
+    ax = fig.add_subplot(224)
+    ax.scatter(y, z)
+    ax.set_xlim(0, np.max(segment[:, :]))
+    ax.set_ylim(0, np.max(segment[:, :]))
+
+
 
     plt.draw()
     plt.pause(0.001)
 
     while True:
         # autolabel
-        if AUTOWALLS and not RELABEL:
-            max_x = max(segment[:, 0])
-            min_x = min(segment[:, 0])
-            max_y = max(segment[:, 1])
-            min_y = min(segment[:, 1])
+        max_x = max(segment[:, 0])
+        min_x = min(segment[:, 0])
+        max_y = max(segment[:, 1])
+        min_y = min(segment[:, 1])
+        max_z = max(segment[:, 2])
+        min_z = min(segment[:, 2])
+
+        if AUTOWALLS:
 
             dist = np.linalg.norm([max_x - min_x, max_y - min_y])
 
             if dist > 6:
                 print(str(ids[i]) + " autolabeled as wall")
                 label = 2
+                labels.append(label)
+                seg_ids.append(ids[i])
                 break
 
         # consider user input
+        print("dx:{} dy:{} dz:{}".format(max_x-min_x, max_y-min_y, max_z-min_z))
         label = input(str(ids[i]) + " label: ")
+        
+        if label in ["0", "1", "2"]:
+            labels.append(label)
+            seg_ids.append(ids[i])
 
         if not label:
             label = default_label
+            labels.append(label)
+            seg_ids.append(ids[i])
             break
         if label in ["0", "1", "2", "q"]:
             break
@@ -133,13 +131,12 @@ for i in range(ids.size):
     if label == "q":
         break
 
-    if RELABEL:
-        labels[lids_lookup[ids[i]]] = label
-    else:
-        fp_labels.write(str(ids[i]) + " " + str(label) + "\n")
-        fp_labels.flush()
 
-if RELABEL:
-    fp_labels = open(os.path.join(config.get_default_dataset_dir()+"/."+config.folder, "labels_database.csv"), "w")
-    for lid, label in zip(lids, labels):
-        fp_labels.write(str(lid) + " " + str(label) + "\n")
+# print(labels)
+# print(range(len(labels)))
+# print(ids)
+if WRITE_LABEL:
+    fp_labels = open(os.path.join(config.base_dir+config.folder, "labels_database.csv"), "w")
+    num = 1
+    for i in range(len(labels)):
+        fp_labels.write(str(seg_ids[i]) + " " + str(labels[i]) + "\n")

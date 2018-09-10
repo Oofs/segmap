@@ -11,7 +11,8 @@ from sklearn import metrics
 import ensure_segmappy_is_installed
 from segmappy import Dataset
 
-DATASET_FOLDER = "for_generating_matches/drive18"
+# DATASET_FOLDER = "for_generating_matches/drive18"
+DATASET_FOLDER = "dataset_loop_long"
 
 dataset = Dataset(folder=DATASET_FOLDER, use_matches=False, normalize_classes=False)
 segments, _, ids, n_ids, features, matches = dataset.load()

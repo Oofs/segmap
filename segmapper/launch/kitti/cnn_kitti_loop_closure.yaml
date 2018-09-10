@@ -70,8 +70,8 @@ SegMapper: {
     Segmenters: {
       segmenter_type: "IncrementalEuclideanDistance", # IncrementalSmoothnessConstraints, SimpleSmoothnessConstraints
       min_cluster_size: 100,
-      max_cluster_size: 15000,
-      radius_for_growing: 0.2
+      max_cluster_size: 15000, # 20000
+      radius_for_growing: 0.2 #1
     },
 
     Descriptors: {
@@ -89,7 +89,7 @@ SegMapper: {
      normalize_eigen_for_knn: false,
      normalize_eigen_for_hard_threshold: false,
      max_eigen_features_values: [2493.5, 186681.0, 188389.0, 0.3304, 188388.0, 1.0899, 0.9987],
-     do_not_use_cars: false,
+     do_not_use_cars: true,
     },
 
     GeometricConsistency: {

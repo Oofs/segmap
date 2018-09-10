@@ -10,9 +10,9 @@ from segmappy.tools.classifiertools import get_default_dataset, get_default_prep
 # read config file
 configfile = "default_training.ini"
 config = Config(configfile)
-
+config.folder = "dataset_loop_long"
 # load dataset and preprocessor
-dataset = get_default_dataset(config)
+dataset = get_default_dataset(config,config.folder)
 preprocessor = get_default_preprocessor(config)
 
 segments, positions, classes, n_classes, _, _, _ = dataset.load(

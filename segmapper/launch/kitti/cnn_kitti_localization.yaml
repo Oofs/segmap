@@ -40,14 +40,14 @@ SegMapper: {
   
   ratio_of_points_to_keep_when_publishing: 1.0,
   
-  export_segments_and_matches: false,
-  publish_predicted_segment_matches: false,
+  export_segments_and_matches: true,
+  publish_predicted_segment_matches: true,
   
   line_scale_loop_closures: 5.0,
   line_scale_matches: 0.4,
 
   SegMatch: {
-    segmentation_radius_m: 50.0,
+    segmentation_radius_m: 50, #50.0,25
     segmentation_height_above_m: 999.0,
     segmentation_height_below_m: 999.0,
 
@@ -89,7 +89,7 @@ SegMapper: {
      normalize_eigen_for_knn: false,
      normalize_eigen_for_hard_threshold: false,
      max_eigen_features_values: [2493.5, 186681.0, 188389.0, 0.3304, 188388.0, 1.0899, 0.9987],
-     do_not_use_cars: false,
+     do_not_use_cars: true,
     },
 
     GeometricConsistency: {

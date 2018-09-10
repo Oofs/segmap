@@ -5,13 +5,21 @@
   <arg name="respawn_value" default="false" /> <!-- boolean: true, false -->
   
   <!-- Bag file path -->  
+ 
   <!-- <arg name="bag_file" value="$(env HOME)/.segmap/kitti/2011_09_30_drive_18.bag"/> -->
+ 
   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_09_30_drive_18.bag"/> -->
-  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_10_03_drive_27.bag"/> -->
+ 
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop4_weekend_synced.bag"/> -->
 
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop_long_weekend_lego_synced.bag"/> -->
 
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/imu_loop_long_test_synced.bag"/> -->
 
-  <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop2_lego_synced.bag"/>
+   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/imu_loop3_synced.bag"/> -->
+
+    <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/weekend_seq1_2018-09-09_synced.bag"/>
+   
 
   <rosparam param="LaserMapper/bag_file" subst_value="True">$(arg bag_file)</rosparam>
   

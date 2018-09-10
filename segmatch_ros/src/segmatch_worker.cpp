@@ -87,6 +87,8 @@ void SegMatchWorker::init(ros::NodeHandle& nh, const SegMatchWorkerParams& param
     loadTargetCloud();
     usleep(1000000);
     publishTargetRepresentation();
+    publishTargetReconstruction();
+
     publishTargetSegmentsCentroids();
   }
 
@@ -141,7 +143,7 @@ bool SegMatchWorker::processLocalMap(
     }
 
     if (!robot_drove_enough) return false;
-
+    ROS_INFO("robot_drove_enough");
     // Process the source cloud.
     segmatch_.processAndSetAsSourceCloud(local_map, latest_pose, track_id);
 
@@ -234,6 +236,7 @@ void SegMatchWorker::publish() {
     publishSourceSegmentsCentroids();
     publishSegmentationPositions();
     publishLastTransformation();
+    
     // If closing loops, republish the target map.
     if (params_.close_loops) {
       publishLoopClosures();
@@ -442,13 +445,22 @@ bool SegMatchWorker::exportRunServiceCall(std_srvs::Empty::Request& req,
 
   if (params_.export_segments_and_matches) {
     // TODO RD clean if not needed.
-    //database::exportMatches("/tmp/online_matcher/run_" + acquisition_time + "_matches.csv",
+    // database::exportMatches("/tmp/online_matcher/run_" + acquisition_time + "_matches.csv",
     //                        matches_database_);
-    database::exportSegmentsAndFeatures("/tmp/online_matcher/run_" + acquisition_time,
+    // database::exportSegmentsAndFeatures("/tmp/online_matcher/run_" + acquisition_time,
+    //                                     segments_database_, true);
+    // database::exportPositions("/tmp/online_matcher/run_" + acquisition_time + "_positions.csv",
+    //                           segments_database_, true);
+    // database::exportMergeEvents("/tmp/online_matcher/run_" + acquisition_time + "_merge_events.csv",
+    //                             segmatch_.getMergeEvents());
+
+    // database::exportMatches("/tmp/online_matcher/matches_database.csv",
+                           // matches_database_);
+    database::exportSegmentsAndFeatures("/tmp/online_matcher/" ,
                                         segments_database_, true);
-    database::exportPositions("/tmp/online_matcher/run_" + acquisition_time + "_positions.csv",
+    database::exportPositions("/tmp/online_matcher/positions_database.csv",
                               segments_database_, true);
-    database::exportMergeEvents("/tmp/online_matcher/run_" + acquisition_time + "_merge_events.csv",
+    database::exportMergeEvents("/tmp/online_matcher/merge_events_database.csv",
                                 segmatch_.getMergeEvents());
   }
 

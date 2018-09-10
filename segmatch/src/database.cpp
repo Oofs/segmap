@@ -332,9 +332,9 @@ bool exportMergeEvents(const std::string& filename, const std::vector<MergeEvent
 bool exportSegmentsAndFeatures(const std::string& filename_prefix,
                                const SegmentedCloud& segmented_cloud,
                                const bool export_all_views) {
-  exportSegments(filename_prefix + "_segments.csv", segmented_cloud, export_all_views);
-  exportFeatures(filename_prefix + "_features.csv", segmented_cloud, export_all_views);
-  exportSegmentsTimestamps(filename_prefix + "_timestamps.csv", segmented_cloud, export_all_views);
+  exportSegments(filename_prefix + "segments_database.csv", segmented_cloud, export_all_views);
+  exportFeatures(filename_prefix + "features_database.csv", segmented_cloud, export_all_views);
+  exportSegmentsTimestamps(filename_prefix + "timestamps_database.csv", segmented_cloud, export_all_views);
 }
 
 bool exportMatches(const std::string& filename, const UniqueIdMatches& matches) {

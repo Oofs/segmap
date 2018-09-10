@@ -111,6 +111,76 @@ class Dataset(object):
             self.labels_dict,
         )
 
+    def load_no_label(self, preprocessor=None):
+        from ..tools.import_export import load_segments, load_positions, load_features
+
+        # load all the csv files
+        self.segments, sids, duplicate_sids = load_segments(folder=self.folder)
+        self.positions, pids, duplicate_pids = load_positions(folder=self.folder)
+        self.features, self.feature_names, fids, duplicate_fids = load_features(
+            folder=self.folder
+        )
+
+        self.classes = np.array(sids)
+        self.duplicate_classes = self.classes.copy()
+        self.positions = np.array(self.positions)
+        self.features = np.array(self.features)
+        self.duplicate_ids = np.array(duplicate_sids)
+
+
+        
+
+        # load matches
+        from ..tools.import_export import load_matches
+
+        self.matches = load_matches(folder=self.folder)
+
+        if self.require_change > 0.0:
+            self._remove_unchanged()
+
+        # combine sequences that are part of a merger
+        if self.use_merges:
+            from ..tools.import_export import load_merges
+
+            merges, _ = load_merges(folder=self.folder)
+            self._combine_sequences(merges)
+            self.duplicate_classes = self.classes.copy()
+
+        # remove small irrelevant segments
+        if self.require_relevance > 0:
+            self._remove_irrelevant()
+
+        # only use segments that are different enough
+        if self.require_diff_points > 0:
+            assert preprocessor is not None
+            self._remove_similar(preprocessor)
+
+        # combine classes based on matches
+        if self.use_matches:
+            self._combine_classes()
+
+        # normalize ids and remove small classes
+        self._normalize_classes()
+
+        print(
+            "  Found",
+            self.n_classes,
+            "valid classes with",
+            len(self.segments),
+            "segments",
+        )
+
+        self._sort_ids()
+
+        return (
+            self.segments,
+            self.positions,
+            self.classes,
+            self.n_classes,
+            self.features,
+            self.matches,
+        )
+
     def _remove_unchanged(self):
         keep = np.ones(self.classes.size).astype(np.bool)
         for cls in np.unique(self.classes):
