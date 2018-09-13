@@ -40,7 +40,7 @@ SegMapper: {
   
   ratio_of_points_to_keep_when_publishing: 1.0,
   
-  export_segments_and_matches: true,
+  export_segments_and_matches: false,
   publish_predicted_segment_matches: true,
   
   line_scale_loop_closures: 5.0,
@@ -79,7 +79,7 @@ SegMapper: {
     },
 
     Classifier: {
-     threshold_to_accept_match: 0.65,
+     threshold_to_accept_match: 0.65, #0.65
      n_nearest_neighbours: 25, #25
      knn_feature_dim: 64, #32
      enable_two_stage_retrieval: false,
@@ -95,7 +95,7 @@ SegMapper: {
     GeometricConsistency: {
       recognizer_type: "Incremental", #"Simple", "Partitioned"
       resolution: 0.4,
-      min_cluster_size: 6,
+      min_cluster_size: 6, #6
       max_consistency_distance_for_caching: 3.0,
     }
   },

@@ -6,7 +6,11 @@
   
   <!-- Bag file path -->  
   <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/segmap_data/kitti/2011_09_30_drive_18.bag"/> -->
-  <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop1_synced.bag"/>
+  <!-- <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/loop1_synced.bag"/> -->
+
+
+ <arg name="bag_file" value="/media/tianning/Seagate\ Expansion\ Drive/ytn/lidar_data/kitti/kitti_2011_09_26_drive_0096_synced.bag"/>
+  
 
   <rosparam param="LaserMapper/bag_file" subst_value="True">$(arg bag_file)</rosparam>
 

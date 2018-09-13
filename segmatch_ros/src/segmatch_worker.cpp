@@ -73,6 +73,17 @@ void SegMatchWorker::init(ros::NodeHandle& nh, const SegMatchWorkerParams& param
 
   last_transformation_pub_ = nh.advertise<geometry_msgs::Transform>(
       "/segmatch/last_transformation", 5, true);
+
+  integrated_localization_pub_ = nh.advertise<nav_msgs::Odometry>(
+    "/segmatch/integrated_localization",5,true);
+
+  trajectory_integrated_pub_ = nh.advertise<nav_msgs::Path>(
+    "/segmatch/integrated_trajectory",5,true);
+
+  odom_subscriber_ = nh.subscribe<tf2_msgs::TFMessage>("/tf",5,&SegMatchWorker::odom_call_back,this);
+  trajectory_integrated_.header.frame_id = "map";
+  trajectory_integrated_.header.seq = 0;
+
   if (std::find(params_.segmatch_params.descriptors_params.descriptor_types.begin(),
                 params_.segmatch_params.descriptors_params.descriptor_types.end(),
                 "CNN") !=
@@ -215,6 +226,56 @@ void SegMatchWorker::update(const Trajectory& trajectory) {
 void SegMatchWorker::update(const std::vector<Trajectory>& trajectories) {
   segmatch_.update(trajectories);
   publish();
+}
+
+
+void SegMatchWorker::odom_call_back(const tf2_msgs::TFMessageConstPtr& lego_loam_odom){
+    if(first_localization_occured_ && lego_loam_odom->transforms[0].header.frame_id == "world" && lego_loam_odom->transforms[0].child_frame_id == "imu"){
+      
+      Eigen::Affine3d transformation_loc2global;
+      segmatch_.getLastTransform(&(transformation_loc2global.matrix()));
+      geometry_msgs::Transform transform_msg_loc2global;
+      tf::transformEigenToMsg(transformation_loc2global,transform_msg_loc2global);
+
+      Eigen::Affine3d transformation_o2loc;
+      tf::transformMsgToEigen(lego_loam_odom->transforms[0].transform, transformation_o2loc);  
+      Eigen::Affine3d transform_o2global =  transformation_loc2global*transformation_o2loc;
+
+      geometry_msgs::Transform transform_msg;
+      tf::transformEigenToMsg(transform_o2global, transform_msg);
+
+
+
+
+      geometry_msgs::PoseStamped pose;
+      nav_msgs::Odometry odom_integrated;
+
+      pose.header.frame_id = "map";
+      pose.pose.position.x =  transform_msg.translation.x;
+      pose.pose.position.y =  transform_msg.translation.y;
+      pose.pose.position.z =  transform_msg.translation.z;
+      pose.pose.orientation.x = transform_msg.rotation.x;
+      pose.pose.orientation.y = transform_msg.rotation.y;
+      pose.pose.orientation.z = transform_msg.rotation.z;
+      pose.pose.orientation.w = transform_msg.rotation.w;
+      trajectory_integrated_.header.seq ++;
+
+      odom_integrated.pose.pose = pose.pose;
+      odom_integrated.header.frame_id="map";
+      odom_integrated.header.seq = trajectory_integrated_.header.seq;
+
+      trajectory_integrated_.poses.push_back(pose);
+
+      if(last_transform_msg_.translation.x != transform_msg_loc2global.translation.x 
+        && last_transform_msg_.translation.y != transform_msg_loc2global.translation.y
+        && last_transform_msg_.translation.z != transform_msg_loc2global.translation.z){
+
+        last_transform_msg_ = transform_msg_loc2global;
+        integrated_localization_pub_.publish(odom_integrated);
+      }
+      trajectory_integrated_pub_.publish(trajectory_integrated_);
+    }
+    return;
 }
 
 void SegMatchWorker::publish() {
@@ -430,10 +491,12 @@ void SegMatchWorker::publishLastTransformation() const {
   if (first_localization_occured_) {
     Eigen::Affine3d transformation;
     segmatch_.getLastTransform(&(transformation.matrix()));
-    ROS_INFO("raw transformation:%f %f %f %f   ",transformation(0,1),transformation(0,2),transformation(0,3),transformation(0,4));
+    // ROS_INFO("raw transformation:%f %f %f %f   ",transformation(0,1),transformation(0,2),transformation(0,3),transformation(0,4));
     geometry_msgs::Transform transform_msg;
     tf::transformEigenToMsg(transformation, transform_msg);
+    // transform_msg.translation.z += params_.distance_to_lower_target_cloud_for_viz_m;
     last_transformation_pub_.publish(transform_msg);
+
   }
 }
 

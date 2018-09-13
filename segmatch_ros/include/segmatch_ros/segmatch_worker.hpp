@@ -8,7 +8,7 @@
 #include <segmatch/local_map.hpp>
 #include <segmatch/segmatch.hpp>
 #include <std_srvs/Empty.h>
-
+#include <nav_msgs/Odometry.h>
 #include "segmatch_ros/common.hpp"
 
 namespace segmatch_ros {
@@ -76,6 +76,7 @@ class SegMatchWorker {
                                       std_srvs::Empty::Response& res);
   bool exportTargetMap(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
 
+  void odom_call_back(const tf2_msgs::TFMessageConstPtr& lego_loam_odom);
   // Parameters.
   SegMatchWorkerParams params_;
 
@@ -95,13 +96,21 @@ class SegMatchWorker {
   ros::Publisher last_transformation_pub_;
   ros::Publisher reconstruction_pub_;
   ros::Publisher bounding_boxes_pub_;
-
+  
+  ros::Publisher integrated_localization_pub_ ;
+  ros::Subscriber odom_subscriber_;
+  ros::Publisher trajectory_integrated_pub_;
+  
   ros::ServiceServer export_run_service_;
   ros::ServiceServer reconstruct_segments_service_;
   ros::ServiceServer toggle_compression_service_;
   ros::ServiceServer toggle_publish_target_service_;
   ros::ServiceServer export_target_map_;
 
+
+  nav_msgs::Path trajectory_integrated_;
+  geometry_msgs::Transform last_transform_msg_;
+  tf2_msgs::TFMessage last_lego_loam_odom_;
   // SegMatch object.
   segmatch::SegMatch segmatch_;
 
